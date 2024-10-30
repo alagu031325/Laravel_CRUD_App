@@ -2,15 +2,23 @@
 
 @section('content')
 <div class="main-content mt-3">
-<div class="card border-dark">
+    @if ($errors->any())
+        @foreach ($errors->all() as $error)
+            <div class="alert alert-danger">
+                {{$error}}
+            </div>
+        @endforeach
+    @endif
+    <div class="card border-dark">
     <div class="card-header d-flex flex-row">
         <div class="me-auto">
             Create Post
         </div>
         <div >       
-            <a class="btn btn-success" href="">Back</a>
+            <a class="btn btn-success" href="{{route('posts.index')}}">Back</a>
         </div> 
     </div>
+ 
     <div class="card-body">
         <form action="{{route('posts.store')}}" method="POST" enctype="multipart/form-data">
             @csrf

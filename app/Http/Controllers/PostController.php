@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 
 class PostController extends Controller
@@ -14,7 +15,20 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::paginate(3);
+        // Caching - Cache Facade
+        
+        // $posts = Post::paginate(3);
+        //ttl - is in sec - it stores the data for 3min in cache 
+        //cache key dynamically generated based on page value 
+        $posts = Cache::remember('posts-page-'.request('page',1),60*3,function(){
+            //return the collection through eloquent query 
+            //mention the relation along with Post to cache those values - when retriving the Post we also retriving the category relationship along with it 
+            return Post::with('category')->paginate(5);
+        });
+        //we can use rememberForever method to store the data indefinitely - takes two args , first is key and second is the call back funtion which returns the collection of data 
+
+
+
         return view('index',compact('posts'));
     }
 
@@ -44,7 +58,9 @@ class PostController extends Controller
         //we need to store the image in storage and then save the path to the database - also change the name of the image so that the names dont conflict even when different users upload images with same name
         $fileName = time().'_'.$request->image->getClientOriginalName();
 
-        $filePath = $request->image->storeAs('uploads',$fileName); //uploads/filename
+        $filePath = $request->image->storeAs('uploads',$fileName); 
+        
+        //uploads/filename
 
         $post = new Post();
         $post->title = $request->title;

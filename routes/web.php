@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PostController;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use PhpParser\Node\Expr\PostDec;
 
@@ -28,3 +29,8 @@ Route::delete('/posts/{id}/force-delete',[PostController::class,'forceDelete'])-
 
 //Resource controller - creates all routes for us which can be seen by running 'php artisan route:list' - eg, for create it is posts.create - is the route name
 Route::resource('posts',PostController::class);
+
+//Removing data from cache storage - can also use artisan command to delete cache - php artisan cache:clear
+Route::get('forget-cache',function(){
+    Cache::forget('posts');
+});
